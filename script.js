@@ -25,7 +25,6 @@ window.login = async function () {
     message.textContent = "Pseudo invalide.";
     return;
   }
-
   if (!password) {
     message.textContent = "Entre un mot de passe.";
     return;
@@ -64,4 +63,8 @@ window.logout = function () {
   document.getElementById("app-container").classList.add("hidden");
   document.body.className = "";
   document.getElementById("password").value = "";
+};
+
+window.openApp = function(page) {
+  window.location.href = page;
 };

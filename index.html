@@ -7,6 +7,7 @@
 </head>
 <body>
 
+<!-- Login -->
 <div class="container" id="login-container">
   <h1>Connexion 💫</h1>
 
@@ -18,14 +19,41 @@
 
   <input type="password" id="password" placeholder="Mot de passe">
   <button onclick="login()">Entrer</button>
-
   <p id="login-message"></p>
 </div>
 
+<!-- Interface principale -->
 <div class="container hidden" id="app-container">
-  <h1 id="welcome-text"></h1>
-  <p>Bienvenue dans votre espace privé ✨</p>
-  <button onclick="logout()">Se déconnecter</button>
+
+  <!-- Bannière -->
+  <div class="banner">
+    <div class="welcome-text" id="welcome-text"></div>
+    <button class="logout-btn" onclick="logout()">Se déconnecter</button>
+  </div>
+
+  <!-- Hub central -->
+  <div class="main-content">
+    <p>Bienvenue dans votre espace privé ✨</p>
+
+    <div class="app-hub">
+      <div class="app-card" onclick="openApp('cartes.html')">
+        <h3>Jeu de cartes</h3>
+        <p>Joue avec les cartes et défis</p>
+      </div>
+
+      <div class="app-card" onclick="openApp('album.html')">
+        <h3>Album de souvenirs</h3>
+        <p>Regarde vos moments préférés</p>
+      </div>
+
+      <div class="app-card" onclick="openApp('messages.html')">
+        <h3>Messages privés</h3>
+        <p>Écris un message à l'autre</p>
+      </div>
+
+      <!-- Ajouter d'autres cartes ici -->
+    </div>
+  </div>
 </div>
 
 <script type="module" src="script.js"></script>
