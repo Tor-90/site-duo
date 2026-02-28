@@ -7,6 +7,12 @@
 </head>
 <body>
 
+<!-- Bannière fixe -->
+<div class="banner" id="banner-top" style="display:none;">
+  <div class="welcome-text" id="welcome-text"></div>
+  <button class="logout-btn" onclick="logout()">Se déconnecter</button>
+</div>
+
 <!-- Login -->
 <div class="container" id="login-container">
   <h1>Connexion 💫</h1>
@@ -22,16 +28,8 @@
   <p id="login-message"></p>
 </div>
 
-<!-- Interface principale -->
+<!-- Hub central -->
 <div class="container hidden" id="app-container">
-
-  <!-- Bannière -->
-  <div class="banner">
-    <div class="welcome-text" id="welcome-text"></div>
-    <button class="logout-btn" onclick="logout()">Se déconnecter</button>
-  </div>
-
-  <!-- Hub central -->
   <div class="main-content">
     <p>Bienvenue dans votre espace privé ✨</p>
 
@@ -50,8 +48,6 @@
         <h3>Messages privés</h3>
         <p>Écris un message à l'autre</p>
       </div>
-
-      <!-- Ajouter d'autres cartes ici -->
     </div>
   </div>
 </div>
