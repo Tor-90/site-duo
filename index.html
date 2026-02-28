@@ -40,6 +40,13 @@
     const btn = document.getElementById('login-btn');
     const errorMsg = document.getElementById('error-msg');
 
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.style.display = 'block';
+      btn.textContent = 'Entrer ✨';
+      btn.disabled = false;
+    }
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       errorMsg.style.display = 'none';
@@ -49,29 +56,49 @@
       const password = document.getElementById('password').value.trim();
 
       if (!username || !password) {
-        errorMsg.textContent = 'Remplis tous les champs ✨';
-        errorMsg.style.display = 'block';
+        showError('Remplis tous les champs ✨');
         return;
       }
 
       const userLower = username.toLowerCase();
 
       if (userLower !== 'toratino' && userLower !== 'luxi') {
-        errorMsg.textContent = 'Utilisateur inconnu 🌙';
-        errorMsg.style.display = 'block';
+        showError('Utilisateur inconnu 🌙');
         return;
       }
 
       btn.textContent = '✨ Connexion...';
       btn.disabled = true;
 
-      setTimeout(function() {
-        if (userLower === 'toratino') {
-          window.location.href = './toratino.html';
-        } else {
-          window.location.href = './luxi.html';
-        }
-      }, 800);
+      // Vérifier dans Firestore
+      db.collection('utilisateurs').doc(userLower).get()
+        .then(function(doc) {
+          if (!doc.exists) {
+            // Première connexion : créer le mot de passe
+            if (confirm('Première connexion ! Tu veux définir "' + password + '" comme mot de passe ?')) {
+              db.collection('utilisateurs').doc(userLower).set({
+                motDePasse: password,
+                creeeLe: new Date().toISOString()
+              }).then(function() {
+                window.location.href = './' + userLower + '.html';
+              }).catch(function(err) {
+                showError('Erreur : ' + err.message);
+              });
+            } else {
+              showError('Mot de passe annulé. Réessaie !');
+            }
+          } else {
+            // Connexion suivante : vérifier le mot de passe
+            if (doc.data().motDePasse === password) {
+              window.location.href = './' + userLower + '.html';
+            } else {
+              showError('Mot de passe incorrect 🔒');
+            }
+          }
+        })
+        .catch(function(err) {
+          showError('Erreur de connexion : ' + err.message);
+        });
     });
   </script>
 </body>
