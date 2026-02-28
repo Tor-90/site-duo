@@ -11,13 +11,13 @@
 
   <div class="login-container">
     <div class="login-box">
-      <h1>T <span style="color:#ff6b9d;">♥</span> L</h1>
+      <h1>N <span style="color:#ff6b9d;">♥</span> L</h1>
       <p class="subtitle">notre univers</p>
 
       <form id="login-form">
         <div class="input-group">
           <label for="username">Pseudo</label>
-          <input type="text" id="username" placeholder="Toratino ou Luxi" autocomplete="off" spellcheck="false" />
+          <input type="text" id="username" placeholder="Nicolas ou Luxi" autocomplete="off" spellcheck="false" />
         </div>
         <div class="input-group">
           <label for="password">Mot de passe</label>
@@ -62,7 +62,7 @@
 
       const userLower = username.toLowerCase();
 
-      if (userLower !== 'toratino' && userLower !== 'luxi') {
+      if (userLower !== 'nicolas' && userLower !== 'luxi') {
         showError('Utilisateur inconnu 🌙');
         return;
       }

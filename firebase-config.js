@@ -1,4 +1,4 @@
-// Firebase Configuration - Site Duo (Toratino & Luxi)
+// Firebase Configuration - Site Duo (Nicolas & Luxi)
 
 const firebaseConfig = {
   apiKey: "AIzaSyBS5ZVhHgbQI1YFsvQbciGIzRIvk8vPE88",

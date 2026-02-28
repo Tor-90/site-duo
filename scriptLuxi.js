@@ -1,9 +1,11 @@
-// ===== PHRASE DU JOUR (Firestore) =====
-// Luxi LIT la phrase écrite par Toratino, et ÉCRIT une phrase pour Toratino
+const CURRENT_USER = 'luxi';
 
-// Écouter en temps réel la phrase que Toratino a écrite pour Luxi
+// ===== PHRASE DU JOUR (Firestore) =====
+// Luxi LIT la phrase écrite par Nicolas, et ÉCRIT une phrase pour Nicolas
+
+// Écouter en temps réel la phrase que Nicolas a écrite pour Luxi
 db.collection('phrasesDuJour').doc('luxi')
-  .onSnapshot(function (doc) {
+  .onSnapshot(function(doc) {
     const el = document.getElementById('messageOfDay');
     if (doc.exists && doc.data().phrase) {
       el.textContent = '"' + doc.data().phrase + '"';
@@ -12,25 +14,25 @@ db.collection('phrasesDuJour').doc('luxi')
     }
   });
 
-// Envoyer une phrase pour Toratino
+// Envoyer une phrase pour Nicolas
 function envoyerPhrase() {
   const input = document.getElementById('phraseInput');
   const phrase = input.value.trim();
   if (!phrase) return;
-  db.collection('phrasesDuJour').doc('toratino').set({
+  db.collection('phrasesDuJour').doc('nicolas').set({
     phrase: phrase,
     auteur: 'Luxi',
     date: new Date().toISOString()
-  }).then(function () {
+  }).then(function() {
     input.value = '';
-    alert('Phrase envoyée à Toratino ! 🌙');
-  }).catch(function (err) {
+    alert('Phrase envoyée à Nicolas ! 🌙');
+  }).catch(function(err) {
     alert('Erreur : ' + err.message);
   });
 }
 
 // ===== TOGETHER COUNTER =====
-const startDate = new Date('2026-01-27'); // Change this to your real date!
+const startDate = new Date('2026-01-01'); // Change this to your real date!
 function updateCounter() {
   const now = new Date();
   const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
@@ -75,10 +77,10 @@ function updateCountdowns() {
       target.setFullYear(target.getFullYear() + 1);
       diff = target - now;
     }
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+    const secs = Math.floor((diff % (1000*60)) / 1000);
     card.querySelector('.cd-days').textContent = days;
     card.querySelector('.cd-hours').textContent = hours;
     card.querySelector('.cd-mins').textContent = mins;
@@ -91,8 +93,8 @@ setInterval(updateCountdowns, 1000);
 // ===== CALENDAR =====
 let calMonth = new Date().getMonth();
 let calYear = new Date().getFullYear();
-const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const dayNames = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
 
 function saveCalendarEvents() {
@@ -191,7 +193,7 @@ renderEventsList();
 
 // ===== JOURNAL =====
 function parseJournalDate(dateStr) {
-  const months = { janvier: 0, février: 1, mars: 2, avril: 3, mai: 4, juin: 5, juillet: 6, août: 7, septembre: 8, octobre: 9, novembre: 10, décembre: 11 };
+  const months = {janvier:0,février:1,mars:2,avril:3,mai:4,juin:5,juillet:6,août:7,septembre:8,octobre:9,novembre:10,décembre:11};
   const parts = dateStr.trim().split(' ');
   if (parts.length === 3) {
     return new Date(parseInt(parts[2]), months[parts[1].toLowerCase()] || 0, parseInt(parts[0]));
@@ -218,7 +220,7 @@ function addJournalEntry() {
   const dateInput = document.getElementById('journalDate');
   const selectedDate = dateInput.value ? new Date(dateInput.value + 'T12:00:00') : new Date();
   entry.innerHTML = `
-    <div class="date">${selectedDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+    <div class="date">${selectedDate.toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'})}</div>
     <div class="content">${input.value}</div>
   `;
   document.getElementById('journalEntries').appendChild(entry);
@@ -233,7 +235,7 @@ document.addEventListener('DOMContentLoaded', sortJournalEntries);
 function addPhoto(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       const item = createPhotoItem(e.target.result);
       const grid = document.getElementById('photoGrid');
       grid.insertBefore(item, grid.lastElementChild);
@@ -256,7 +258,7 @@ function createPhotoItem(src) {
   del.textContent = '✕';
   del.className = 'photo-delete-btn';
   del.style.cssText = 'position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;opacity:0.7;transition:opacity 0.2s;';
-  del.addEventListener('click', function (e) {
+  del.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
     if (confirm('Supprimer cette photo ?')) {
@@ -296,8 +298,8 @@ loadPhotos();
 
 
 // ===== RANDOM WHEEL =====
-const wheelOptions = ['Restaurant 🍕', 'Film 🎬', 'Balade 🚶', 'Jeu de société 🎲', 'Cuisine ensemble 👩‍🍳', 'Massage 💆', 'Musée 🖼️', 'Pique-nique 🧺'];
-const wheelColors = ['#8e3a6e', '#b84a8e', '#6e3a5e', '#a04a7e', '#7e2a5e', '#c85a9e', '#5e2a4e', '#9e3a7e'];
+const wheelOptions = ['Restaurant 🍕','Film 🎬','Balade 🚶','Jeu de société 🎲','Cuisine ensemble 👩‍🍳','Massage 💆','Musée 🖼️','Pique-nique 🧺'];
+const wheelColors = ['#8e3a6e','#b84a8e','#6e3a5e','#a04a7e','#7e2a5e','#c85a9e','#5e2a4e','#9e3a7e'];
 let wheelAngle = 0;
 let wheelSpinning = false;
 
@@ -359,17 +361,39 @@ function spinWheel() {
 }
 drawWheel();
 
-// ===== CHAT =====
+// ===== REAL-TIME CHAT (FIREBASE) =====
+const rtdb = firebase.database();
+
 function sendChat() {
   const input = document.getElementById('chatInput');
   if (!input.value.trim()) return;
-  const msg = document.createElement('div');
-  msg.className = 'chat-message sent';
   const now = new Date();
-  msg.innerHTML = `<div>${input.value}</div><div class="msg-time">${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}</div>`;
-  document.getElementById('chatMessages').appendChild(msg);
+  rtdb.ref('chat').push({
+    text: input.value.trim(),
+    sender: 'luxi',
+    time: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0'),
+    timestamp: now.getTime()
+  });
   input.value = '';
-  document.getElementById('chatMessages').scrollTop = 999999;
+}
+
+function initChat() {
+  const chatContainer = document.getElementById('chatMessages');
+  rtdb.ref('chat').orderByChild('timestamp').on('child_added', (snapshot) => {
+    const data = snapshot.val();
+    const msg = document.createElement('div');
+    msg.className = 'chat-message ' + (data.sender === 'luxi' ? 'sent' : 'received');
+    msg.innerHTML = `<div>${data.text}</div><div class="msg-time">${data.time}</div>`;
+    chatContainer.appendChild(msg);
+    chatContainer.scrollTop = 999999;
+  });
+}
+
+// Init chat
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initChat);
+} else {
+  setTimeout(initChat, 100);
 }
 
 // ===== BUCKET LIST =====
@@ -384,16 +408,100 @@ function addBucketItem() {
   if (!input.value.trim()) return;
   const li = document.createElement('li');
   li.className = 'bucket-item';
-  li.onclick = function () { toggleBucket(this); };
+  li.onclick = function() { toggleBucket(this); };
   li.innerHTML = `<div class="bucket-check"></div><span class="text">${input.value}</span>`;
   document.getElementById('bucketList').appendChild(li);
   input.value = '';
 }
 
+// ===== MAP (LEAFLET + FIREBASE) =====
+let leafletMap;
+let addingPin = false;
+
+function initMap() {
+  leafletMap = L.map('leafletMap').setView([46.603354, 1.888334], 6); // France center
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(leafletMap);
+
+  // Load existing pins from Firebase
+  rtdb.ref('pins').on('value', (snapshot) => {
+    // Clear existing markers
+    leafletMap.eachLayer((layer) => {
+      if (layer instanceof L.Marker) leafletMap.removeLayer(layer);
+    });
+    // Clear pin list
+    document.getElementById('mapPins').innerHTML = '';
+
+    const pins = snapshot.val();
+    if (pins) {
+      Object.keys(pins).forEach(key => {
+        const pin = pins[key];
+        addMarkerToMap(pin.lat, pin.lng, pin.name, key);
+        addPinToList(pin.name, key);
+      });
+    }
+  });
+
+  leafletMap.on('click', function(e) {
+    if (!addingPin) return;
+    const name = document.getElementById('pinName').value.trim();
+    if (!name) { alert('Donne un nom au lieu !'); return; }
+
+    // Save to Firebase
+    rtdb.ref('pins').push({
+      lat: e.latlng.lat,
+      lng: e.latlng.lng,
+      name: name,
+      addedBy: CURRENT_USER,
+      date: new Date().toISOString()
+    });
+
+    document.getElementById('pinName').value = '';
+    addingPin = false;
+    document.getElementById('pinInstruction').style.display = 'none';
+    document.getElementById('addPinBtn').textContent = '📍 Ajouter un lieu';
+  });
+}
+
+function addMarkerToMap(lat, lng, name, key) {
+  const marker = L.marker([lat, lng]).addTo(leafletMap);
+  marker.bindPopup(`<b>${name}</b>`);
+}
+
+function addPinToList(name, key) {
+  const div = document.createElement('div');
+  div.className = 'map-pin';
+  div.style.cssText = 'display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:rgba(255,255,255,0.08); border-radius:20px; font-size:0.9em; margin:4px;';
+  div.innerHTML = `📍 ${name} <span onclick="deletePin('${key}')" style="cursor:pointer; margin-left:4px; opacity:0.6;">✕</span>`;
+  document.getElementById('mapPins').appendChild(div);
+}
+
+function startAddPin() {
+  const name = document.getElementById('pinName').value.trim();
+  if (!name) { alert('Écris d\'abord le nom du lieu !'); return; }
+  addingPin = true;
+  document.getElementById('pinInstruction').style.display = 'block';
+  document.getElementById('addPinBtn').textContent = '⏳ Clique sur la carte...';
+}
+
+function deletePin(key) {
+  if (confirm('Supprimer ce lieu ?')) {
+    rtdb.ref('pins/' + key).remove();
+  }
+}
+
+// Initialize map when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMap);
+} else {
+  // Small delay to ensure Leaflet is loaded
+  setTimeout(initMap, 100);
+}
+
 // ===== NAV HIGHLIGHT =====
 document.querySelectorAll('.nav-links a').forEach(link => {
-  link.addEventListener('click', function () {
+  link.addEventListener('click', function() {
     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
     this.classList.add('active');
   });
-});

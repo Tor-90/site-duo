@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Toratino 🌙</title>
+  <title>Nicolas 🌙</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="theme-toratino">
+<body class="theme-nicolas">
   <canvas id="starry-bg"></canvas>
 
   <!-- NAV BAR -->
   <nav class="nav-bar">
-    <div class="nav-logo">🌙 Toratino</div>
+    <div class="nav-logo">🌙 Nicolas</div>
     <div class="nav-links">
       <a href="#album" class="active">📸 Album</a>
       <a href="#journal">📓 Journal</a>
@@ -31,7 +33,7 @@
     <!-- PROFILE HEADER -->
     <div class="profile-header">
       <div class="profile-ring">🌙</div>
-      <h1>Bienvenue, Mon Toratino</h1>
+      <h1>Bienvenue, Mon Nicolas</h1>
       <p class="subtitle">Ton espace dans les étoiles ✨</p>
       <div class="message-of-day">
         💌 <em id="messageOfDay">Chargement...</em>
@@ -72,6 +74,14 @@
         <button class="btn-primary" onclick="addJournalEntry()">Ajouter au journal ✍️</button>
       </div>
       <div id="journalEntries" style="margin-top: 24px;">
+        <div class="card journal-entry">
+          <div class="date">14 février 2026</div>
+          <div class="content">Notre premier Saint-Valentin ensemble... Le début d'une belle histoire 💕</div>
+        </div>
+        <div class="card journal-entry">
+          <div class="date">1 janvier 2026</div>
+          <div class="content">Bonne année mon amour ! Cette année sera la nôtre 🎆</div>
+        </div>
       </div>
     </div>
 
@@ -157,12 +167,13 @@
     <div class="section" id="map">
       <h2 class="section-title">📍 Nos Endroits</h2>
       <div class="card map-container">
-        <div class="map-placeholder">
-          <div class="icon">🗺️</div>
-          <div style="color: rgba(255,255,255,0.5);">Notre carte des souvenirs</div>
+        <div id="leafletMap" style="height: 400px; border-radius: 16px; z-index: 1;"></div>
+        <div style="margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+          <input type="text" id="pinName" placeholder="Nom du lieu (ex: Notre resto ❤️)" style="padding:10px 16px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:0.9em; backdrop-filter:blur(8px); width:250px;">
+          <button onclick="startAddPin()" id="addPinBtn" style="padding:10px 20px; border-radius:20px; border:none; background:linear-gradient(135deg,#7c3aed,#a78bfa); color:#fff; cursor:pointer; font-size:0.9em;">📍 Ajouter un lieu</button>
         </div>
-        <div class="map-pins">
-        </div>
+        <p id="pinInstruction" style="text-align:center; color:rgba(255,255,255,0.5); font-size:0.85em; margin-top:8px; display:none;">👆 Clique sur la carte pour placer le marqueur</p>
+        <div class="map-pins" id="mapPins" style="margin-top: 12px;"></div>
       </div>
     </div>
 
@@ -185,7 +196,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script src="scriptToratino.js"></script>
+  <script src="scriptNicolas.js"></script>
 </body>
 </html>

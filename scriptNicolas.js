@@ -1,8 +1,10 @@
-// ===== PHRASE DU JOUR (Firestore) =====
-// Toratino LIT la phrase écrite par Luxi, et ÉCRIT une phrase pour Luxi
+const CURRENT_USER = 'nicolas';
 
-// Écouter en temps réel la phrase que Luxi a écrite pour Toratino
-db.collection('phrasesDuJour').doc('toratino')
+// ===== PHRASE DU JOUR (Firestore) =====
+// Nicolas LIT la phrase écrite par Luxi, et ÉCRIT une phrase pour Luxi
+
+// Écouter en temps réel la phrase que Luxi a écrite pour Nicolas
+db.collection('phrasesDuJour').doc('nicolas')
   .onSnapshot(function(doc) {
     const el = document.getElementById('messageOfDay');
     if (doc.exists && doc.data().phrase) {
@@ -19,7 +21,7 @@ function envoyerPhrase() {
   if (!phrase) return;
   db.collection('phrasesDuJour').doc('luxi').set({
     phrase: phrase,
-    auteur: 'Toratino',
+    auteur: 'Nicolas',
     date: new Date().toISOString()
   }).then(function() {
     input.value = '';
@@ -30,7 +32,7 @@ function envoyerPhrase() {
 }
 
 // ===== TOGETHER COUNTER =====
-const startDate = new Date('2026-01-27'); // Change this to your real date!
+const startDate = new Date('2026-01-01'); // Change this to your real date!
 function updateCounter() {
   const now = new Date();
   const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
@@ -277,11 +279,11 @@ function savePhotos() {
     const match = bg.match(/url\(["']?(.+?)["']?\)/);
     if (match) photos.push(match[1]);
   });
-  localStorage.setItem('toratino_photos', JSON.stringify(photos));
+  localStorage.setItem('nicolas_photos', JSON.stringify(photos));
 }
 
 function loadPhotos() {
-  const saved = localStorage.getItem('toratino_photos');
+  const saved = localStorage.getItem('nicolas_photos');
   if (saved) {
     const photos = JSON.parse(saved);
     const grid = document.getElementById('photoGrid');
@@ -357,17 +359,39 @@ function spinWheel() {
 }
 drawWheel();
 
-// ===== CHAT =====
+// ===== REAL-TIME CHAT (FIREBASE) =====
+const rtdb = firebase.database();
+
 function sendChat() {
   const input = document.getElementById('chatInput');
   if (!input.value.trim()) return;
-  const msg = document.createElement('div');
-  msg.className = 'chat-message sent';
   const now = new Date();
-  msg.innerHTML = `<div>${input.value}</div><div class="msg-time">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</div>`;
-  document.getElementById('chatMessages').appendChild(msg);
+  rtdb.ref('chat').push({
+    text: input.value.trim(),
+    sender: 'nicolas',
+    time: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0'),
+    timestamp: now.getTime()
+  });
   input.value = '';
-  document.getElementById('chatMessages').scrollTop = 999999;
+}
+
+function initChat() {
+  const chatContainer = document.getElementById('chatMessages');
+  rtdb.ref('chat').orderByChild('timestamp').on('child_added', (snapshot) => {
+    const data = snapshot.val();
+    const msg = document.createElement('div');
+    msg.className = 'chat-message ' + (data.sender === 'nicolas' ? 'sent' : 'received');
+    msg.innerHTML = `<div>${data.text}</div><div class="msg-time">${data.time}</div>`;
+    chatContainer.appendChild(msg);
+    chatContainer.scrollTop = 999999;
+  });
+}
+
+// Init chat
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initChat);
+} else {
+  setTimeout(initChat, 100);
 }
 
 // ===== BUCKET LIST =====
@@ -386,6 +410,91 @@ function addBucketItem() {
   li.innerHTML = `<div class="bucket-check"></div><span class="text">${input.value}</span>`;
   document.getElementById('bucketList').appendChild(li);
   input.value = '';
+}
+
+// ===== MAP (LEAFLET + FIREBASE) =====
+let leafletMap;
+let addingPin = false;
+
+function initMap() {
+  leafletMap = L.map('leafletMap').setView([46.603354, 1.888334], 6); // France center
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(leafletMap);
+
+  // Load existing pins from Firebase
+  rtdb.ref('pins').on('value', (snapshot) => {
+    // Clear existing markers
+    leafletMap.eachLayer((layer) => {
+      if (layer instanceof L.Marker) leafletMap.removeLayer(layer);
+    });
+    // Clear pin list
+    document.getElementById('mapPins').innerHTML = '';
+
+    const pins = snapshot.val();
+    if (pins) {
+      Object.keys(pins).forEach(key => {
+        const pin = pins[key];
+        addMarkerToMap(pin.lat, pin.lng, pin.name, key);
+        addPinToList(pin.name, key);
+      });
+    }
+  });
+
+  leafletMap.on('click', function(e) {
+    if (!addingPin) return;
+    const name = document.getElementById('pinName').value.trim();
+    if (!name) { alert('Donne un nom au lieu !'); return; }
+
+    // Save to Firebase
+    rtdb.ref('pins').push({
+      lat: e.latlng.lat,
+      lng: e.latlng.lng,
+      name: name,
+      addedBy: CURRENT_USER,
+      date: new Date().toISOString()
+    });
+
+    document.getElementById('pinName').value = '';
+    addingPin = false;
+    document.getElementById('pinInstruction').style.display = 'none';
+    document.getElementById('addPinBtn').textContent = '📍 Ajouter un lieu';
+  });
+}
+
+function addMarkerToMap(lat, lng, name, key) {
+  const marker = L.marker([lat, lng]).addTo(leafletMap);
+  marker.bindPopup(`<b>${name}</b>`);
+}
+
+function addPinToList(name, key) {
+  const div = document.createElement('div');
+  div.className = 'map-pin';
+  div.style.cssText = 'display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:rgba(255,255,255,0.08); border-radius:20px; font-size:0.9em; margin:4px;';
+  div.innerHTML = `📍 ${name} <span onclick="deletePin('${key}')" style="cursor:pointer; margin-left:4px; opacity:0.6;">✕</span>`;
+  document.getElementById('mapPins').appendChild(div);
+}
+
+function startAddPin() {
+  const name = document.getElementById('pinName').value.trim();
+  if (!name) { alert('Écris d\'abord le nom du lieu !'); return; }
+  addingPin = true;
+  document.getElementById('pinInstruction').style.display = 'block';
+  document.getElementById('addPinBtn').textContent = '⏳ Clique sur la carte...';
+}
+
+function deletePin(key) {
+  if (confirm('Supprimer ce lieu ?')) {
+    rtdb.ref('pins/' + key).remove();
+  }
+}
+
+// Initialize map when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMap);
+} else {
+  // Small delay to ensure Leaflet is loaded
+  setTimeout(initMap, 100);
 }
 
 // ===== NAV HIGHLIGHT =====
