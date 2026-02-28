@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Nicolas & Luxi</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container" id="login-container">
+  <h1>Connexion 💫</h1>
+
+  <select id="username">
+    <option value="">Choisir un pseudo</option>
+    <option value="Nicolas">Nicolas</option>
+    <option value="Luxi">Luxi</option>
+  </select>
+
+  <input type="password" id="password" placeholder="Mot de passe">
+  <button onclick="login()">Entrer</button>
+  <p id="login-message"></p>
+</div>
+
+<div class="container hidden" id="app-container">
+  <h1 id="welcome-text"></h1>
+  <p>Bienvenue dans votre espace privé ✨</p>
+  <button onclick="logout()">Se déconnecter</button>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
