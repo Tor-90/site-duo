@@ -3,7 +3,7 @@
 
 // Écouter en temps réel la phrase que Toratino a écrite pour Luxi
 db.collection('phrasesDuJour').doc('luxi')
-  .onSnapshot(function(doc) {
+  .onSnapshot(function (doc) {
     const el = document.getElementById('messageOfDay');
     if (doc.exists && doc.data().phrase) {
       el.textContent = '"' + doc.data().phrase + '"';
@@ -21,16 +21,16 @@ function envoyerPhrase() {
     phrase: phrase,
     auteur: 'Luxi',
     date: new Date().toISOString()
-  }).then(function() {
+  }).then(function () {
     input.value = '';
     alert('Phrase envoyée à Toratino ! 🌙');
-  }).catch(function(err) {
+  }).catch(function (err) {
     alert('Erreur : ' + err.message);
   });
 }
 
 // ===== TOGETHER COUNTER =====
-const startDate = new Date('2026-01-01'); // Change this to your real date!
+const startDate = new Date('2026-01-27'); // Change this to your real date!
 function updateCounter() {
   const now = new Date();
   const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
@@ -75,10 +75,10 @@ function updateCountdowns() {
       target.setFullYear(target.getFullYear() + 1);
       diff = target - now;
     }
-    const days = Math.floor(diff / (1000*60*60*24));
-    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
-    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
-    const secs = Math.floor((diff % (1000*60)) / 1000);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
     card.querySelector('.cd-days').textContent = days;
     card.querySelector('.cd-hours').textContent = hours;
     card.querySelector('.cd-mins').textContent = mins;
@@ -91,8 +91,8 @@ setInterval(updateCountdowns, 1000);
 // ===== CALENDAR =====
 let calMonth = new Date().getMonth();
 let calYear = new Date().getFullYear();
-const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-const dayNames = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
 
 function saveCalendarEvents() {
@@ -191,7 +191,7 @@ renderEventsList();
 
 // ===== JOURNAL =====
 function parseJournalDate(dateStr) {
-  const months = {janvier:0,février:1,mars:2,avril:3,mai:4,juin:5,juillet:6,août:7,septembre:8,octobre:9,novembre:10,décembre:11};
+  const months = { janvier: 0, février: 1, mars: 2, avril: 3, mai: 4, juin: 5, juillet: 6, août: 7, septembre: 8, octobre: 9, novembre: 10, décembre: 11 };
   const parts = dateStr.trim().split(' ');
   if (parts.length === 3) {
     return new Date(parseInt(parts[2]), months[parts[1].toLowerCase()] || 0, parseInt(parts[0]));
@@ -218,7 +218,7 @@ function addJournalEntry() {
   const dateInput = document.getElementById('journalDate');
   const selectedDate = dateInput.value ? new Date(dateInput.value + 'T12:00:00') : new Date();
   entry.innerHTML = `
-    <div class="date">${selectedDate.toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'})}</div>
+    <div class="date">${selectedDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
     <div class="content">${input.value}</div>
   `;
   document.getElementById('journalEntries').appendChild(entry);
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', sortJournalEntries);
 function addPhoto(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       const item = createPhotoItem(e.target.result);
       const grid = document.getElementById('photoGrid');
       grid.insertBefore(item, grid.lastElementChild);
@@ -256,7 +256,7 @@ function createPhotoItem(src) {
   del.textContent = '✕';
   del.className = 'photo-delete-btn';
   del.style.cssText = 'position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.7);color:white;border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;opacity:0.7;transition:opacity 0.2s;';
-  del.addEventListener('click', function(e) {
+  del.addEventListener('click', function (e) {
     e.preventDefault();
     e.stopPropagation();
     if (confirm('Supprimer cette photo ?')) {
@@ -296,8 +296,8 @@ loadPhotos();
 
 
 // ===== RANDOM WHEEL =====
-const wheelOptions = ['Restaurant 🍕','Film 🎬','Balade 🚶','Jeu de société 🎲','Cuisine ensemble 👩‍🍳','Massage 💆','Musée 🖼️','Pique-nique 🧺'];
-const wheelColors = ['#8e3a6e','#b84a8e','#6e3a5e','#a04a7e','#7e2a5e','#c85a9e','#5e2a4e','#9e3a7e'];
+const wheelOptions = ['Restaurant 🍕', 'Film 🎬', 'Balade 🚶', 'Jeu de société 🎲', 'Cuisine ensemble 👩‍🍳', 'Massage 💆', 'Musée 🖼️', 'Pique-nique 🧺'];
+const wheelColors = ['#8e3a6e', '#b84a8e', '#6e3a5e', '#a04a7e', '#7e2a5e', '#c85a9e', '#5e2a4e', '#9e3a7e'];
 let wheelAngle = 0;
 let wheelSpinning = false;
 
@@ -366,7 +366,7 @@ function sendChat() {
   const msg = document.createElement('div');
   msg.className = 'chat-message sent';
   const now = new Date();
-  msg.innerHTML = `<div>${input.value}</div><div class="msg-time">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</div>`;
+  msg.innerHTML = `<div>${input.value}</div><div class="msg-time">${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}</div>`;
   document.getElementById('chatMessages').appendChild(msg);
   input.value = '';
   document.getElementById('chatMessages').scrollTop = 999999;
@@ -384,7 +384,7 @@ function addBucketItem() {
   if (!input.value.trim()) return;
   const li = document.createElement('li');
   li.className = 'bucket-item';
-  li.onclick = function() { toggleBucket(this); };
+  li.onclick = function () { toggleBucket(this); };
   li.innerHTML = `<div class="bucket-check"></div><span class="text">${input.value}</span>`;
   document.getElementById('bucketList').appendChild(li);
   input.value = '';
@@ -392,7 +392,8 @@ function addBucketItem() {
 
 // ===== NAV HIGHLIGHT =====
 document.querySelectorAll('.nav-links a').forEach(link => {
-  link.addEventListener('click', function() {
+  link.addEventListener('click', function () {
     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
     this.classList.add('active');
   });
+});

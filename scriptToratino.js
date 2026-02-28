@@ -30,7 +30,7 @@ function envoyerPhrase() {
 }
 
 // ===== TOGETHER COUNTER =====
-const startDate = new Date('2026-01-01'); // Change this to your real date!
+const startDate = new Date('2026-01-27'); // Change this to your real date!
 function updateCounter() {
   const now = new Date();
   const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));

@@ -72,14 +72,6 @@
         <button class="btn-primary" onclick="addJournalEntry()">Ajouter au journal ✍️</button>
       </div>
       <div id="journalEntries" style="margin-top: 24px;">
-        <div class="card journal-entry">
-          <div class="date">14 février 2026</div>
-          <div class="content">Notre premier Saint-Valentin ensemble... Le début d'une belle histoire 💕</div>
-        </div>
-        <div class="card journal-entry">
-          <div class="date">1 janvier 2026</div>
-          <div class="content">Bonne année mon amour ! Cette année sera la nôtre 🎆</div>
-        </div>
       </div>
     </div>
 
@@ -153,22 +145,6 @@
       <h2 class="section-title">💬 Nos Messages</h2>
       <div class="card chat-container">
         <div class="chat-messages" id="chatMessages">
-          <div class="chat-message received">
-            <div>Tu me manques 🥺</div>
-            <div class="msg-time">14:32</div>
-          </div>
-          <div class="chat-message sent">
-            <div>Toi aussi mon cœur 💜</div>
-            <div class="msg-time">14:33</div>
-          </div>
-          <div class="chat-message received">
-            <div>On se voit ce soir ? 🌙</div>
-            <div class="msg-time">14:35</div>
-          </div>
-          <div class="chat-message sent">
-            <div>Évidemment ! J'ai hâte ✨</div>
-            <div class="msg-time">14:36</div>
-          </div>
         </div>
         <div class="chat-input-area">
           <input class="chat-input" id="chatInput" placeholder="Écris un message..." onkeypress="if(event.key==='Enter')sendChat()">
@@ -186,10 +162,6 @@
           <div style="color: rgba(255,255,255,0.5);">Notre carte des souvenirs</div>
         </div>
         <div class="map-pins">
-          <div class="map-pin">📍 Paris</div>
-          <div class="map-pin">📍 Premier restaurant</div>
-          <div class="map-pin">📍 Plage de l'été</div>
-          <div class="map-pin">📍 Notre spot secret</div>
         </div>
       </div>
     </div>
@@ -199,30 +171,6 @@
       <h2 class="section-title">🏆 Bucket List</h2>
       <div class="card">
         <ul class="bucket-list" id="bucketList">
-          <li class="bucket-item completed" onclick="toggleBucket(this)">
-            <div class="bucket-check done">✓</div>
-            <span class="text">Premier baiser sous la pluie 🌧️</span>
-          </li>
-          <li class="bucket-item" onclick="toggleBucket(this)">
-            <div class="bucket-check"></div>
-            <span class="text">Voir les aurores boréales ensemble 🌌</span>
-          </li>
-          <li class="bucket-item" onclick="toggleBucket(this)">
-            <div class="bucket-check"></div>
-            <span class="text">Road trip en van 🚐</span>
-          </li>
-          <li class="bucket-item" onclick="toggleBucket(this)">
-            <div class="bucket-check"></div>
-            <span class="text">Apprendre à danser ensemble 💃🕺</span>
-          </li>
-          <li class="bucket-item" onclick="toggleBucket(this)">
-            <div class="bucket-check"></div>
-            <span class="text">Cuisiner un repas gastronomique 👨‍🍳</span>
-          </li>
-          <li class="bucket-item" onclick="toggleBucket(this)">
-            <div class="bucket-check"></div>
-            <span class="text">Camper sous les étoiles ⛺</span>
-          </li>
         </ul>
         <div class="bucket-add">
           <input type="text" id="bucketInput" placeholder="Ajouter un rêve à réaliser...">
