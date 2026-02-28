@@ -68,3 +68,41 @@ window.logout = function () {
 window.openApp = function(page) {
   window.location.href = page;
 };
+
+function createStars(count = 100) {
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement("div");
+    star.classList.add("star");
+    star.style.top = Math.random() * window.innerHeight + "px";
+    star.style.left = Math.random() * window.innerWidth + "px";
+    star.style.width = star.style.height = Math.random() * 2 + 1 + "px";
+    star.style.animationDuration = 1 + Math.random() * 3 + "s";
+    document.body.appendChild(star);
+  }
+}
+
+// Créer étoiles après que la page soit chargée
+window.addEventListener("load", () => {
+  createStars(120); // 120 étoiles
+});
+
+function createParticles(count = 80) {
+  for (let i = 0; i < count; i++) {
+    const particle = document.createElement("div");
+    particle.classList.add("particle");
+    // Position initiale aléatoire
+    particle.style.top = Math.random() * window.innerHeight + "px";
+    particle.style.left = Math.random() * window.innerWidth + "px";
+    // Taille et vitesse aléatoire
+    const size = 1 + Math.random() * 2;
+    particle.style.width = particle.style.height = size + "px";
+    particle.style.animationDuration = 5 + Math.random() * 5 + "s";
+    particle.style.animationDelay = Math.random() * 5 + "s";
+    document.body.appendChild(particle);
+  }
+}
+
+window.addEventListener("load", () => {
+  createStars(120);      // les étoiles
+  createParticles(80);   // particules flottantes
+});
