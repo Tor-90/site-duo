@@ -1,10 +1,10 @@
 const CURRENT_USER = 'nicolas';
+const OTHER_USER = 'luxi';
+const rtdb = firebase.database();
 
 // ===== PHRASE DU JOUR (Firestore) =====
-// Nicolas LIT la phrase écrite par Luxi, et ÉCRIT une phrase pour Luxi
-
-// Écouter en temps réel la phrase que Luxi a écrite pour Nicolas
-db.collection('phrasesDuJour').doc('nicolas')
+// Listen for phrase written by the other user for us
+db.collection('phrasesDuJour').doc(CURRENT_USER)
   .onSnapshot(function(doc) {
     const el = document.getElementById('messageOfDay');
     if (doc.exists && doc.data().phrase) {
@@ -14,12 +14,12 @@ db.collection('phrasesDuJour').doc('nicolas')
     }
   });
 
-// Envoyer une phrase pour Luxi
+// Send phrase to the other user
 function envoyerPhrase() {
   const input = document.getElementById('phraseInput');
   const phrase = input.value.trim();
   if (!phrase) return;
-  db.collection('phrasesDuJour').doc('luxi').set({
+  db.collection('phrasesDuJour').doc(OTHER_USER).set({
     phrase: phrase,
     auteur: 'Nicolas',
     date: new Date().toISOString()
@@ -32,7 +32,7 @@ function envoyerPhrase() {
 }
 
 // ===== TOGETHER COUNTER =====
-const startDate = new Date('2026-01-01'); // Change this to your real date!
+const startDate = new Date('2026-01-27');
 function updateCounter() {
   const now = new Date();
   const diff = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
@@ -41,31 +41,47 @@ function updateCounter() {
 updateCounter();
 setInterval(updateCounter, 60000);
 
-// ===== COUNTDOWN =====
+// ===== COUNTDOWN (FIREBASE) =====
 function addCountdown() {
   const emoji = document.getElementById('cdEmoji').value || '🎯';
   const name = document.getElementById('cdName').value.trim();
   const date = document.getElementById('cdDate').value;
   if (!name || !date) return alert('Remplis le nom et la date !');
-  const card = document.createElement('div');
-  card.className = 'card countdown-card';
-  card.dataset.date = date;
-  card.innerHTML = `
-    <button onclick="this.parentElement.remove()" style="position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1.2em;" title="Supprimer">✕</button>
-    <div class="event-emoji">${emoji}</div>
-    <div class="event-name">${name}</div>
-    <div class="countdown-time">
-      <div class="unit"><span class="number cd-days">--</span><span class="label">jours</span></div>
-      <div class="unit"><span class="number cd-hours">--</span><span class="label">heures</span></div>
-      <div class="unit"><span class="number cd-mins">--</span><span class="label">min</span></div>
-      <div class="unit"><span class="number cd-secs">--</span><span class="label">sec</span></div>
-    </div>
-  `;
-  document.getElementById('countdownGrid').appendChild(card);
-  updateCountdowns();
+  rtdb.ref('countdowns').push({ emoji, name, date, addedBy: CURRENT_USER });
   document.getElementById('cdEmoji').value = '';
   document.getElementById('cdName').value = '';
   document.getElementById('cdDate').value = '';
+}
+
+function deleteCountdown(key) {
+  if (confirm('Supprimer ce countdown ?')) rtdb.ref('countdowns/' + key).remove();
+}
+
+function renderCountdowns(snapshot) {
+  const grid = document.getElementById('countdownGrid');
+  grid.innerHTML = '';
+  const data = snapshot.val();
+  if (!data) return;
+  Object.keys(data).forEach(key => {
+    const cd = data[key];
+    const card = document.createElement('div');
+    card.className = 'card countdown-card';
+    card.dataset.date = cd.date;
+    card.dataset.key = key;
+    card.innerHTML = `
+      <button onclick="deleteCountdown('${key}')" style="position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1.2em;" title="Supprimer">✕</button>
+      <div class="event-emoji">${cd.emoji}</div>
+      <div class="event-name">${cd.name}</div>
+      <div class="countdown-time">
+        <div class="unit"><span class="number cd-days">--</span><span class="label">jours</span></div>
+        <div class="unit"><span class="number cd-hours">--</span><span class="label">heures</span></div>
+        <div class="unit"><span class="number cd-mins">--</span><span class="label">min</span></div>
+        <div class="unit"><span class="number cd-secs">--</span><span class="label">sec</span></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  updateCountdowns();
 }
 
 function updateCountdowns() {
@@ -73,10 +89,7 @@ function updateCountdowns() {
     const target = new Date(card.dataset.date);
     const now = new Date();
     let diff = target - now;
-    if (diff < 0) {
-      target.setFullYear(target.getFullYear() + 1);
-      diff = target - now;
-    }
+    if (diff < 0) { target.setFullYear(target.getFullYear() + 1); diff = target - now; }
     const days = Math.floor(diff / (1000*60*60*24));
     const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
     const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
@@ -87,38 +100,40 @@ function updateCountdowns() {
     card.querySelector('.cd-secs').textContent = secs;
   });
 }
-updateCountdowns();
+rtdb.ref('countdowns').on('value', renderCountdowns);
 setInterval(updateCountdowns, 1000);
 
-// ===== CALENDAR =====
+// ===== CALENDAR (FIREBASE) =====
 let calMonth = new Date().getMonth();
 let calYear = new Date().getFullYear();
 const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const dayNames = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
-let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents') || '[]');
-
-function saveCalendarEvents() {
-  localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
-}
+let calendarEvents = [];
 
 function addEvent() {
   const dateVal = document.getElementById('eventDate').value;
   const emoji = document.getElementById('eventEmoji').value || '📌';
   const name = document.getElementById('eventName').value.trim();
   if (!dateVal || !name) return;
-  calendarEvents.push({ date: dateVal, emoji, name });
-  calendarEvents.sort((a, b) => a.date.localeCompare(b.date));
-  saveCalendarEvents();
-  renderCalendar();
-  renderEventsList();
+  rtdb.ref('calendarEvents').push({ date: dateVal, emoji, name, addedBy: CURRENT_USER });
   document.getElementById('eventDate').value = '';
   document.getElementById('eventEmoji').value = '';
   document.getElementById('eventName').value = '';
 }
 
-function removeEvent(idx) {
-  calendarEvents.splice(idx, 1);
-  saveCalendarEvents();
+function removeEvent(key) {
+  if (confirm('Supprimer cet événement ?')) rtdb.ref('calendarEvents/' + key).remove();
+}
+
+function renderCalendarData(snapshot) {
+  calendarEvents = [];
+  const data = snapshot.val();
+  if (data) {
+    Object.keys(data).forEach(key => {
+      calendarEvents.push({ ...data[key], key });
+    });
+    calendarEvents.sort((a, b) => a.date.localeCompare(b.date));
+  }
   renderCalendar();
   renderEventsList();
 }
@@ -130,14 +145,14 @@ function renderEventsList() {
     list.innerHTML = '<p style="opacity:0.5;text-align:center;">Aucun événement pour l\'instant</p>';
     return;
   }
-  calendarEvents.forEach((ev, idx) => {
+  calendarEvents.forEach(ev => {
     const d = new Date(ev.date + 'T00:00:00');
     const dayNum = d.getDate();
     const monthStr = monthNames[d.getMonth()].substring(0, 3);
     const item = document.createElement('div');
     item.className = 'calendar-event-item';
     item.style.cssText = 'display:flex;justify-content:space-between;align-items:center;';
-    item.innerHTML = `<span><span class="dot"></span> ${dayNum} ${monthStr} ${d.getFullYear()} — ${ev.name} ${ev.emoji}</span><button onclick="removeEvent(${idx})" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:16px;">✕</button>`;
+    item.innerHTML = `<span><span class="dot"></span> ${dayNum} ${monthStr} ${d.getFullYear()} — ${ev.name} ${ev.emoji}</span><button onclick="removeEvent('${ev.key}')" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:16px;">✕</button>`;
     list.appendChild(item);
   });
 }
@@ -175,61 +190,67 @@ function renderCalendar() {
     const el = document.createElement('div');
     el.className = 'day';
     el.textContent = d;
-    if (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()) {
-      el.classList.add('today');
-    }
+    if (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear()) el.classList.add('today');
     if (eventDays.has(d)) el.classList.add('has-event');
     grid.appendChild(el);
   }
 }
+
 function changeMonth(dir) {
   calMonth += dir;
   if (calMonth > 11) { calMonth = 0; calYear++; }
   if (calMonth < 0) { calMonth = 11; calYear--; }
   renderCalendar();
 }
-renderCalendar();
-renderEventsList();
 
-// ===== JOURNAL =====
-function parseJournalDate(dateStr) {
-  const months = {janvier:0,février:1,mars:2,avril:3,mai:4,juin:5,juillet:6,août:7,septembre:8,octobre:9,novembre:10,décembre:11};
-  const parts = dateStr.trim().split(' ');
-  if (parts.length === 3) {
-    return new Date(parseInt(parts[2]), months[parts[1].toLowerCase()] || 0, parseInt(parts[0]));
-  }
-  return new Date(0);
-}
+rtdb.ref('calendarEvents').on('value', renderCalendarData);
 
-function sortJournalEntries() {
-  const container = document.getElementById('journalEntries');
-  const entries = Array.from(container.querySelectorAll('.journal-entry'));
-  entries.sort((a, b) => {
-    const dateA = parseJournalDate(a.querySelector('.date').textContent);
-    const dateB = parseJournalDate(b.querySelector('.date').textContent);
-    return dateB - dateA;
-  });
-  entries.forEach(e => container.appendChild(e));
-}
-
+// ===== JOURNAL (FIREBASE) =====
 function addJournalEntry() {
   const input = document.getElementById('journalInput');
   if (!input.value.trim()) return;
-  const entry = document.createElement('div');
-  entry.className = 'card journal-entry';
   const dateInput = document.getElementById('journalDate');
-  const selectedDate = dateInput.value ? new Date(dateInput.value + 'T12:00:00') : new Date();
-  entry.innerHTML = `
-    <div class="date">${selectedDate.toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'})}</div>
-    <div class="content">${input.value}</div>
-  `;
-  document.getElementById('journalEntries').appendChild(entry);
-  sortJournalEntries();
+  const selectedDate = dateInput.value || new Date().toISOString().split('T')[0];
+  rtdb.ref('journal').push({
+    date: selectedDate,
+    content: input.value.trim(),
+    addedBy: CURRENT_USER,
+    timestamp: new Date().getTime()
+  });
   input.value = '';
   dateInput.value = '';
 }
 
-document.addEventListener('DOMContentLoaded', sortJournalEntries);
+function deleteJournal(key) {
+  if (confirm('Supprimer cette entrée ?')) rtdb.ref('journal/' + key).remove();
+}
+
+function renderJournal(snapshot) {
+  const container = document.getElementById('journalEntries');
+  container.innerHTML = '';
+  const data = snapshot.val();
+  if (!data) {
+    container.innerHTML = '<p style="opacity:0.5;text-align:center;">Aucune entrée pour le moment ✍️</p>';
+    return;
+  }
+  // Sort by date descending
+  const entries = Object.keys(data).map(key => ({ ...data[key], key }));
+  entries.sort((a, b) => b.date.localeCompare(a.date));
+  entries.forEach(entry => {
+    const d = new Date(entry.date + 'T00:00:00');
+    const dateStr = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    const div = document.createElement('div');
+    div.className = 'card journal-entry';
+    div.innerHTML = `
+      <button onclick="deleteJournal('${entry.key}')" style="position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1.1em;" title="Supprimer">✕</button>
+      <div class="date">${dateStr}</div>
+      <div class="content">${entry.content}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+rtdb.ref('journal').on('value', renderJournal);
 
 // ===== PHOTO =====
 function addPhoto(input) {
@@ -252,7 +273,6 @@ function createPhotoItem(src) {
   item.style.backgroundSize = 'cover';
   item.style.backgroundPosition = 'center';
   item.style.position = 'relative';
-  item.innerHTML = '';
 
   const del = document.createElement('span');
   del.textContent = '✕';
@@ -267,7 +287,6 @@ function createPhotoItem(src) {
     }
   });
   item.appendChild(del);
-
   return item;
 }
 
@@ -279,11 +298,11 @@ function savePhotos() {
     const match = bg.match(/url\(["']?(.+?)["']?\)/);
     if (match) photos.push(match[1]);
   });
-  localStorage.setItem('nicolas_photos', JSON.stringify(photos));
+  localStorage.setItem(CURRENT_USER + '_photos', JSON.stringify(photos));
 }
 
 function loadPhotos() {
-  const saved = localStorage.getItem('nicolas_photos');
+  const saved = localStorage.getItem(CURRENT_USER + '_photos');
   if (saved) {
     const photos = JSON.parse(saved);
     const grid = document.getElementById('photoGrid');
@@ -295,24 +314,50 @@ function loadPhotos() {
 }
 loadPhotos();
 
-// ===== RANDOM WHEEL =====
-const wheelOptions = ['Restaurant 🍕','Film 🎬','Balade 🚶','Jeu de société 🎲','Cuisine ensemble 👩‍🍳','Massage 💆','Musée 🖼️','Pique-nique 🧺'];
-const wheelColors = ['#2a1a6e','#4a2a9e','#1a3a6e','#3a1a8e','#2a2a5e','#5a3aae','#1a2a4e','#4a1a7e'];
+// ===== RANDOM WHEEL (FIREBASE) =====
+let wheelOptions = [];
 let wheelAngle = 0;
 let wheelSpinning = false;
+
+function generateWheelColors(count) {
+  const isNicolas = CURRENT_USER === 'nicolas';
+  const colors = [];
+  for (let i = 0; i < count; i++) {
+    const hue = isNicolas ? (240 + (i * 30) % 60) : (320 + (i * 25) % 50);
+    const sat = 50 + (i * 7) % 30;
+    const light = 25 + (i * 5) % 20;
+    colors.push(`hsl(${hue}, ${sat}%, ${light}%)`);
+  }
+  return colors;
+}
 
 function drawWheel() {
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   const cx = 140, cy = 140, r = 130;
   ctx.clearRect(0, 0, 280, 280);
+
+  if (wheelOptions.length === 0) {
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Ajoute des options !', cx, cy);
+    ctx.textAlign = 'start';
+    return;
+  }
+
+  const colors = generateWheelColors(wheelOptions.length);
   const arc = (2 * Math.PI) / wheelOptions.length;
   wheelOptions.forEach((opt, i) => {
     const start = wheelAngle + i * arc;
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, r, start, start + arc);
-    ctx.fillStyle = wheelColors[i];
+    ctx.fillStyle = colors[i];
     ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.1)';
     ctx.stroke();
@@ -321,7 +366,7 @@ function drawWheel() {
     ctx.rotate(start + arc / 2);
     ctx.fillStyle = '#fff';
     ctx.font = '11px sans-serif';
-    ctx.fillText(opt, 30, 4);
+    ctx.fillText(opt.length > 18 ? opt.substring(0, 16) + '..' : opt, 30, 4);
     ctx.restore();
   });
   ctx.beginPath();
@@ -332,8 +377,47 @@ function drawWheel() {
   ctx.stroke();
 }
 
+function addWheelOption() {
+  const input = document.getElementById('wheelOptionInput');
+  const val = input.value.trim();
+  if (!val) return;
+  rtdb.ref('wheelOptions').push({ text: val });
+  input.value = '';
+}
+
+function removeWheelOption(key) {
+  rtdb.ref('wheelOptions/' + key).remove();
+}
+
+function renderWheelOptions(snapshot) {
+  wheelOptions = [];
+  const list = document.getElementById('wheelOptionsList');
+  list.innerHTML = '';
+  const data = snapshot.val();
+  if (data) {
+    Object.keys(data).forEach(key => {
+      wheelOptions.push(data[key].text);
+      const tag = document.createElement('span');
+      tag.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,0.1);border-radius:16px;font-size:0.85em;';
+      tag.innerHTML = `${data[key].text} <span onclick="removeWheelOption('${key}')" style="cursor:pointer;opacity:0.6;">✕</span>`;
+      list.appendChild(tag);
+    });
+  }
+  drawWheel();
+}
+
+rtdb.ref('wheelOptions').on('value', renderWheelOptions);
+
+// Listen for wheel result from the other user
+rtdb.ref('wheelResult').on('value', (snapshot) => {
+  const data = snapshot.val();
+  if (data && data.text) {
+    document.getElementById('wheelResult').textContent = data.text + ' !';
+  }
+});
+
 function spinWheel() {
-  if (wheelSpinning) return;
+  if (wheelSpinning || wheelOptions.length === 0) return;
   wheelSpinning = true;
   const spinAmount = Math.random() * Math.PI * 8 + Math.PI * 10;
   const duration = 4000;
@@ -352,23 +436,23 @@ function spinWheel() {
       const arc = (2 * Math.PI) / wheelOptions.length;
       const normalized = ((2 * Math.PI - (wheelAngle % (2 * Math.PI))) + Math.PI * 1.5) % (2 * Math.PI);
       const index = Math.floor(normalized / arc) % wheelOptions.length;
-      document.getElementById('wheelResult').textContent = wheelOptions[index] + ' !';
+      const result = wheelOptions[index];
+      document.getElementById('wheelResult').textContent = result + ' !';
+      // Save result to Firebase so the other user sees it
+      rtdb.ref('wheelResult').set({ text: result, spinner: CURRENT_USER, time: new Date().getTime() });
     }
   }
   requestAnimationFrame(animate);
 }
-drawWheel();
 
 // ===== REAL-TIME CHAT (FIREBASE) =====
-const rtdb = firebase.database();
-
 function sendChat() {
   const input = document.getElementById('chatInput');
   if (!input.value.trim()) return;
   const now = new Date();
   rtdb.ref('chat').push({
     text: input.value.trim(),
-    sender: 'nicolas',
+    sender: CURRENT_USER,
     time: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0'),
     timestamp: now.getTime()
   });
@@ -380,63 +464,87 @@ function initChat() {
   rtdb.ref('chat').orderByChild('timestamp').on('child_added', (snapshot) => {
     const data = snapshot.val();
     const msg = document.createElement('div');
-    msg.className = 'chat-message ' + (data.sender === 'nicolas' ? 'sent' : 'received');
+    msg.className = 'chat-message ' + (data.sender === CURRENT_USER ? 'sent' : 'received');
     msg.innerHTML = `<div>${data.text}</div><div class="msg-time">${data.time}</div>`;
     chatContainer.appendChild(msg);
     chatContainer.scrollTop = 999999;
   });
 }
 
-// Init chat
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initChat);
-} else {
-  setTimeout(initChat, 100);
-}
-
-// ===== BUCKET LIST =====
-function toggleBucket(el) {
-  el.classList.toggle('completed');
-  const check = el.querySelector('.bucket-check');
-  check.classList.toggle('done');
-  check.textContent = check.classList.contains('done') ? '✓' : '';
-}
+// ===== BUCKET LIST (FIREBASE) =====
 function addBucketItem() {
   const input = document.getElementById('bucketInput');
   if (!input.value.trim()) return;
-  const li = document.createElement('li');
-  li.className = 'bucket-item';
-  li.onclick = function() { toggleBucket(this); };
-  li.innerHTML = `<div class="bucket-check"></div><span class="text">${input.value}</span>`;
-  document.getElementById('bucketList').appendChild(li);
+  rtdb.ref('bucketlist').push({ text: input.value.trim(), completed: false, addedBy: CURRENT_USER });
   input.value = '';
 }
+
+function toggleBucketItem(key, currentState) {
+  rtdb.ref('bucketlist/' + key).update({ completed: !currentState });
+}
+
+function deleteBucketItem(key) {
+  if (confirm('Supprimer ce rêve ?')) rtdb.ref('bucketlist/' + key).remove();
+}
+
+function renderBucketList(snapshot) {
+  const list = document.getElementById('bucketList');
+  list.innerHTML = '';
+  const data = snapshot.val();
+  if (!data) {
+    list.innerHTML = '<li style="opacity:0.5;text-align:center;list-style:none;">Aucun rêve pour le moment... Ajoutez-en un ! ✨</li>';
+    return;
+  }
+  Object.keys(data).forEach(key => {
+    const item = data[key];
+    const li = document.createElement('li');
+    li.className = 'bucket-item' + (item.completed ? ' completed' : '');
+    li.innerHTML = `
+      <div class="bucket-check ${item.completed ? 'done' : ''}" onclick="toggleBucketItem('${key}', ${item.completed})">${item.completed ? '✓' : ''}</div>
+      <span class="text">${item.text}</span>
+      <span onclick="deleteBucketItem('${key}')" style="cursor:pointer;opacity:0.4;margin-left:auto;font-size:0.9em;">✕</span>
+    `;
+    list.appendChild(li);
+  });
+}
+
+rtdb.ref('bucketlist').on('value', renderBucketList);
 
 // ===== MAP (LEAFLET + FIREBASE) =====
 let leafletMap;
 let addingPin = false;
 
+// Custom colored markers
+const blueIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+});
+const redIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+});
+
 function initMap() {
-  leafletMap = L.map('leafletMap').setView([46.603354, 1.888334], 6); // France center
+  leafletMap = L.map('leafletMap').setView([46.603354, 1.888334], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap'
   }).addTo(leafletMap);
 
-  // Load existing pins from Firebase
   rtdb.ref('pins').on('value', (snapshot) => {
-    // Clear existing markers
     leafletMap.eachLayer((layer) => {
       if (layer instanceof L.Marker) leafletMap.removeLayer(layer);
     });
-    // Clear pin list
     document.getElementById('mapPins').innerHTML = '';
-
     const pins = snapshot.val();
     if (pins) {
       Object.keys(pins).forEach(key => {
         const pin = pins[key];
-        addMarkerToMap(pin.lat, pin.lng, pin.name, key);
-        addPinToList(pin.name, key);
+        const icon = pin.addedBy === 'nicolas' ? blueIcon : redIcon;
+        const marker = L.marker([pin.lat, pin.lng], { icon }).addTo(leafletMap);
+        marker.bindPopup(`<b>${pin.name}</b><br><small>par ${pin.addedBy === 'nicolas' ? 'Nicolas' : 'Luxi'}</small>`);
+        addPinToList(pin.name, key, pin.addedBy);
       });
     }
   });
@@ -445,16 +553,10 @@ function initMap() {
     if (!addingPin) return;
     const name = document.getElementById('pinName').value.trim();
     if (!name) { alert('Donne un nom au lieu !'); return; }
-
-    // Save to Firebase
     rtdb.ref('pins').push({
-      lat: e.latlng.lat,
-      lng: e.latlng.lng,
-      name: name,
-      addedBy: CURRENT_USER,
-      date: new Date().toISOString()
+      lat: e.latlng.lat, lng: e.latlng.lng, name: name,
+      addedBy: CURRENT_USER, date: new Date().toISOString()
     });
-
     document.getElementById('pinName').value = '';
     addingPin = false;
     document.getElementById('pinInstruction').style.display = 'none';
@@ -462,16 +564,12 @@ function initMap() {
   });
 }
 
-function addMarkerToMap(lat, lng, name, key) {
-  const marker = L.marker([lat, lng]).addTo(leafletMap);
-  marker.bindPopup(`<b>${name}</b>`);
-}
-
-function addPinToList(name, key) {
+function addPinToList(name, key, addedBy) {
+  const color = addedBy === 'nicolas' ? '🔵' : '🔴';
   const div = document.createElement('div');
   div.className = 'map-pin';
-  div.style.cssText = 'display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:rgba(255,255,255,0.08); border-radius:20px; font-size:0.9em; margin:4px;';
-  div.innerHTML = `📍 ${name} <span onclick="deletePin('${key}')" style="cursor:pointer; margin-left:4px; opacity:0.6;">✕</span>`;
+  div.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(255,255,255,0.08);border-radius:20px;font-size:0.9em;margin:4px;';
+  div.innerHTML = `${color} ${name} <span onclick="deletePin('${key}')" style="cursor:pointer;margin-left:4px;opacity:0.6;">✕</span>`;
   document.getElementById('mapPins').appendChild(div);
 }
 
@@ -484,17 +582,19 @@ function startAddPin() {
 }
 
 function deletePin(key) {
-  if (confirm('Supprimer ce lieu ?')) {
-    rtdb.ref('pins/' + key).remove();
-  }
+  if (confirm('Supprimer ce lieu ?')) rtdb.ref('pins/' + key).remove();
 }
 
-// Initialize map when DOM is ready
+// ===== INIT =====
+function initAll() {
+  initChat();
+  initMap();
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initMap);
+  document.addEventListener('DOMContentLoaded', initAll);
 } else {
-  // Small delay to ensure Leaflet is loaded
-  setTimeout(initMap, 100);
+  setTimeout(initAll, 100);
 }
 
 // ===== NAV HIGHLIGHT =====
@@ -502,5 +602,7 @@ document.querySelectorAll('.nav-links a').forEach(link => {
   link.addEventListener('click', function() {
     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
     this.classList.add('active');
+    // Auto-close mobile menu
+    document.querySelector('.nav-links').classList.remove('open');
   });
 });

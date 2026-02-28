@@ -707,11 +707,101 @@ body.theme-luxi {
   to { transform: rotate(360deg); }
 }
 
+/* ===== HAMBURGER MENU ===== */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+.hamburger:hover { background: rgba(255,255,255,0.1); }
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  .hamburger { display: block; }
+
+  .nav-bar {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  .nav-bar > .nav-logo { order: 1; }
+  .nav-bar > .hamburger { order: 2; }
+  .nav-bar > .btn-logout { order: 3; display: none; }
+
+  .nav-links {
+    display: none;
+    width: 100%;
+    order: 4;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 10px;
+  }
+  .nav-links.open {
+    display: flex;
+  }
+  .nav-links a {
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+  }
+  .nav-links .mobile-logout {
+    color: rgba(255,100,100,0.8);
+    margin-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 12px;
+  }
+
   .two-columns { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
   .cards-grid { grid-template-columns: 1fr; }
-  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .profile-header h1 { font-size: 1.5rem; }
+  .photo-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+
+  .main-content {
+    padding-top: 70px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .profile-header { padding: 20px 10px; }
+  .profile-header h1 { font-size: 1.4rem; }
+  .profile-ring { width: 90px; height: 90px; font-size: 2.2rem; }
+
+  .section { margin: 30px 0; }
+  .section-title { font-size: 1.4rem; }
+
+  .card { padding: 16px; }
+
+  .counter-box { padding: 16px 20px; }
+  .counter-box .days { font-size: 2rem; }
+
+  .calendar-container { max-width: 100%; }
+  .calendar-grid .day { padding: 8px 2px; font-size: 0.8rem; }
+
+  .wheel-canvas-container { width: 240px; height: 240px; }
+
+  .chat-messages { height: 250px; padding: 12px; }
+  .chat-message { max-width: 85%; }
+
+  .countdown-time .number { font-size: 1.4rem; }
+
+  #map { height: 250px !important; }
+
+  .map-pins { gap: 6px; }
+  .map-pin { font-size: 0.8rem; padding: 5px 10px; }
+
+  .bucket-item { padding: 10px 12px; }
+}
+
+@media (max-width: 400px) {
+  .profile-header h1 { font-size: 1.2rem; }
+  .profile-ring { width: 70px; height: 70px; font-size: 1.8rem; }
+  .wheel-canvas-container { width: 200px; height: 200px; }
+  .countdown-time { gap: 8px; }
+  .countdown-time .number { font-size: 1.1rem; }
 }

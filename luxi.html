@@ -14,16 +14,17 @@
   <!-- NAV BAR -->
   <nav class="nav-bar">
     <div class="nav-logo">💫 Luxi</div>
+    <button class="hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
     <div class="nav-links">
       <a href="#album" class="active">📸 Album</a>
       <a href="#journal">📓 Journal</a>
       <a href="#countdown">⏳ Countdown</a>
       <a href="#calendar">🗓️ Calendrier</a>
-
       <a href="#wheel">🎲 Roue</a>
       <a href="#chat">💬 Chat</a>
       <a href="#map">📍 Carte</a>
       <a href="#bucket">🏆 Bucket List</a>
+      <a href="index.html" class="mobile-logout">🚪 Déconnexion</a>
     </div>
     <button class="btn-logout" onclick="window.location.href='index.html'">Déconnexion</button>
   </nav>
@@ -73,16 +74,7 @@
         </label>
         <button class="btn-primary" onclick="addJournalEntry()">Ajouter au journal ✍️</button>
       </div>
-      <div id="journalEntries" style="margin-top: 24px;">
-        <div class="card journal-entry">
-          <div class="date">14 février 2026</div>
-          <div class="content">La plus belle Saint-Valentin de ma vie 💕 Merci d'être toi.</div>
-        </div>
-        <div class="card journal-entry">
-          <div class="date">1 janvier 2026</div>
-          <div class="content">Nouvelle année, mêmes papillons dans le ventre 🦋✨</div>
-        </div>
-      </div>
+      <div id="journalEntries" style="margin-top: 24px;"></div>
     </div>
 
     <!-- COUNTDOWN -->
@@ -146,6 +138,14 @@
         </div>
         <div class="wheel-result" id="wheelResult"></div>
         <button class="spin-btn btn-primary" onclick="spinWheel()">🎰 Tourner la roue !</button>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <h3 style="margin-bottom:12px; font-size:1em;">Gérer les options</h3>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input id="wheelOptionInput" type="text" placeholder="Nouvelle option..." style="flex:1; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:0.95em;">
+          <button class="btn-primary" onclick="addWheelOption()" style="padding:10px 18px;">Ajouter</button>
+        </div>
+        <div id="wheelOptionsList" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
       </div>
     </div>
 
