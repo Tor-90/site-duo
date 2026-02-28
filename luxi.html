@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Luxi 💫</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-luxi">
+  <canvas id="starry-bg"></canvas>
+
+  <!-- NAV BAR -->
+  <nav class="nav-bar">
+    <div class="nav-logo">💫 Luxi</div>
+    <div class="nav-links">
+      <a href="#album" class="active">📸 Album</a>
+      <a href="#journal">📓 Journal</a>
+      <a href="#countdown">⏳ Countdown</a>
+      <a href="#calendar">🗓️ Calendrier</a>
+
+      <a href="#wheel">🎲 Roue</a>
+      <a href="#chat">💬 Chat</a>
+      <a href="#map">📍 Carte</a>
+      <a href="#bucket">🏆 Bucket List</a>
+    </div>
+    <button class="btn-logout" onclick="window.location.href='index.html'">Déconnexion</button>
+  </nav>
+
+  <div class="main-content">
+
+    <!-- PROFILE HEADER -->
+    <div class="profile-header">
+      <div class="profile-ring">💫</div>
+      <h1>Bienvenue, Ma Luxi</h1>
+      <p class="subtitle">Ton jardin secret dans les étoiles 🌸</p>
+      <div class="message-of-day">
+        💌 <em id="messageOfDay">Chargement...</em>
+      </div>
+      <div style="margin-top: 16px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <input type="text" id="phraseInput" placeholder="Écris une phrase pour Toratino 🌙" style="padding:10px 16px; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:0.9em; backdrop-filter:blur(8px); width:280px;">
+        <button onclick="envoyerPhrase()" style="padding:10px 20px; border-radius:20px; border:none; background:linear-gradient(135deg,#ec4899,#f9a8d4); color:#fff; cursor:pointer; font-size:0.9em;">Envoyer 💌</button>
+      </div>
+    </div>
+
+    <!-- TOGETHER COUNTER -->
+    <div class="counter-box">
+      <div class="days" id="daysTogether">---</div>
+      <div class="label">jours ensemble ❤️</div>
+    </div>
+
+    <!-- ALBUM PHOTO -->
+    <div class="section" id="album">
+      <h2 class="section-title">📸 Album Photo</h2>
+      <div class="photo-grid" id="photoGrid">
+        <div class="photo-upload-btn" onclick="document.getElementById('photoInput').click()">
+          <span class="icon">+</span>
+          <span>Ajouter une photo</span>
+        </div>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="addPhoto(this)">
+    </div>
+
+    <!-- JOURNAL -->
+    <div class="section" id="journal">
+      <h2 class="section-title">📓 Notre Journal</h2>
+      <textarea class="journal-new" id="journalInput" placeholder="Écris un souvenir, une pensée, un moment..."></textarea>
+      <div style="display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap;">
+        <label style="display:flex; align-items:center; gap:8px; color:rgba(255,255,255,0.7); font-size:0.9em;">
+          📅 Date :
+          <input type="date" id="journalDate" style="padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:0.95em; backdrop-filter:blur(8px);">
+        </label>
+        <button class="btn-primary" onclick="addJournalEntry()">Ajouter au journal ✍️</button>
+      </div>
+      <div id="journalEntries" style="margin-top: 24px;">
+        <div class="card journal-entry">
+          <div class="date">14 février 2026</div>
+          <div class="content">La plus belle Saint-Valentin de ma vie 💕 Merci d'être toi.</div>
+        </div>
+        <div class="card journal-entry">
+          <div class="date">1 janvier 2026</div>
+          <div class="content">Nouvelle année, mêmes papillons dans le ventre 🦋✨</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <div class="section" id="countdown">
+      <h2 class="section-title">⏳ Nos Countdowns</h2>
+      <div class="card" style="margin-bottom:24px; padding:20px;">
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;">
+          <label style="display:flex; flex-direction:column; gap:4px; color:rgba(255,255,255,0.7); font-size:0.85em;">
+            Emoji
+            <input type="text" id="cdEmoji" placeholder="🎉" maxlength="2" style="width:50px; padding:8px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:1.2em; text-align:center;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:4px; color:rgba(255,255,255,0.7); font-size:0.85em; flex:1; min-width:150px;">
+            Événement
+            <input type="text" id="cdName" placeholder="Nom de l'événement" style="padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:0.95em;">
+          </label>
+          <label style="display:flex; flex-direction:column; gap:4px; color:rgba(255,255,255,0.7); font-size:0.85em;">
+            Date
+            <input type="date" id="cdDate" style="padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.08); color:#fff; font-size:0.95em;">
+          </label>
+          <button class="btn-primary" onclick="addCountdown()">Ajouter ⏳</button>
+        </div>
+      </div>
+      <div class="cards-grid" id="countdownGrid">
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="section" id="calendar">
+      <h2 class="section-title">🗓️ Notre Calendrier</h2>
+      <div class="two-columns">
+        <div class="card calendar-container">
+          <div class="calendar-header">
+            <button class="calendar-nav" onclick="changeMonth(-1)">◀</button>
+            <h3 id="calendarTitle">Février 2026</h3>
+            <button class="calendar-nav" onclick="changeMonth(1)">▶</button>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+        <div class="card calendar-events" id="calendarEvents">
+          <h3 style="margin-bottom:16px;">📌 Événements</h3>
+          <div class="add-event-form" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+            <input type="date" id="eventDate" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+            <input type="text" id="eventEmoji" placeholder="🎉" maxlength="2" style="width:50px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;text-align:center;">
+            <input type="text" id="eventName" placeholder="Nom de l'événement" style="flex:1;min-width:120px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;">
+            <button onclick="addEvent()" style="padding:8px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,#ec4899,#d946ef);color:white;cursor:pointer;">Ajouter</button>
+          </div>
+          <div id="eventsList"></div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- RANDOM WHEEL -->
+    <div class="section" id="wheel">
+      <h2 class="section-title">🎲 Qu'est-ce qu'on fait ?</h2>
+      <div class="card wheel-container">
+        <div class="wheel-canvas-container">
+          <div class="wheel-pointer">▼</div>
+          <canvas id="wheelCanvas" width="280" height="280"></canvas>
+        </div>
+        <div class="wheel-result" id="wheelResult"></div>
+        <button class="spin-btn btn-primary" onclick="spinWheel()">🎰 Tourner la roue !</button>
+      </div>
+    </div>
+
+    <!-- MINI CHAT -->
+    <div class="section" id="chat">
+      <h2 class="section-title">💬 Nos Messages</h2>
+      <div class="card chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-message received">
+            <div>Hey ma belle 🌸</div>
+            <div class="msg-time">14:32</div>
+          </div>
+          <div class="chat-message sent">
+            <div>Coucou mon cœur 💜</div>
+            <div class="msg-time">14:33</div>
+          </div>
+          <div class="chat-message received">
+            <div>J'ai une surprise pour toi 🎁</div>
+            <div class="msg-time">14:35</div>
+          </div>
+          <div class="chat-message sent">
+            <div>Omg dis-moiii ! 😍</div>
+            <div class="msg-time">14:36</div>
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <input class="chat-input" id="chatInput" placeholder="Écris un message..." onkeypress="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP -->
+    <div class="section" id="map">
+      <h2 class="section-title">📍 Nos Endroits</h2>
+      <div class="card map-container">
+        <div class="map-placeholder">
+          <div class="icon">🗺️</div>
+          <div style="color: rgba(255,255,255,0.5);">Notre carte des souvenirs</div>
+        </div>
+        <div class="map-pins">
+          <div class="map-pin">📍 Paris</div>
+          <div class="map-pin">📍 Premier restaurant</div>
+          <div class="map-pin">📍 Plage de l'été</div>
+          <div class="map-pin">📍 Notre spot secret</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUCKET LIST -->
+    <div class="section" id="bucket">
+      <h2 class="section-title">🏆 Bucket List</h2>
+      <div class="card">
+        <ul class="bucket-list" id="bucketList">
+          <li class="bucket-item completed" onclick="toggleBucket(this)">
+            <div class="bucket-check done">✓</div>
+            <span class="text">Premier baiser sous la pluie 🌧️</span>
+          </li>
+          <li class="bucket-item" onclick="toggleBucket(this)">
+            <div class="bucket-check"></div>
+            <span class="text">Voir les aurores boréales ensemble 🌌</span>
+          </li>
+          <li class="bucket-item" onclick="toggleBucket(this)">
+            <div class="bucket-check"></div>
+            <span class="text">Road trip en van 🚐</span>
+          </li>
+          <li class="bucket-item" onclick="toggleBucket(this)">
+            <div class="bucket-check"></div>
+            <span class="text">Apprendre à danser ensemble 💃🕺</span>
+          </li>
+          <li class="bucket-item" onclick="toggleBucket(this)">
+            <div class="bucket-check"></div>
+            <span class="text">Cuisiner un repas gastronomique 👨‍🍳</span>
+          </li>
+          <li class="bucket-item" onclick="toggleBucket(this)">
+            <div class="bucket-check"></div>
+            <span class="text">Camper sous les étoiles ⛺</span>
+          </li>
+        </ul>
+        <div class="bucket-add">
+          <input type="text" id="bucketInput" placeholder="Ajouter un rêve à réaliser...">
+          <button class="btn-primary" onclick="addBucketItem()">+</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="stars.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="scriptLuxi.js"></script>
+</body>
+</html>

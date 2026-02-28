@@ -2,54 +2,77 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Nicolas & Luxi</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T ♥ L — Connexion</title>
+  <link rel="stylesheet" href="./styles.css">
 </head>
-<body>
+<body style="background: #000;">
+  <canvas id="starry-bg"></canvas>
 
-<!-- Bannière fixe en haut -->
-<div class="banner" id="banner-top" style="display:none;">
-  <div class="welcome-text" id="welcome-text"></div>
-  <button class="logout-btn" onclick="logout()">Se déconnecter</button>
-</div>
+  <div class="login-container">
+    <div class="login-box">
+      <h1>T <span style="color:#ff6b9d;">♥</span> L</h1>
+      <p class="subtitle">notre univers</p>
 
-<!-- Login -->
-<div class="container" id="login-container">
-  <h1>Connexion 💫</h1>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="username">Pseudo</label>
+          <input type="text" id="username" placeholder="Toratino ou Luxi" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="input-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" placeholder="••••••••" />
+        </div>
 
-  <select id="username">
-    <option value="">Choisir un pseudo</option>
-    <option value="Nicolas">Nicolas</option>
-    <option value="Luxi">Luxi</option>
-  </select>
-
-  <input type="password" id="password" placeholder="Mot de passe">
-  <button onclick="login()">Entrer</button>
-  <p id="login-message"></p>
-</div>
-
-<!-- Hub central avec mini-applications -->
-<div class="container hidden" id="app-container">
-  <div class="app-hub">
-    <div class="app-card" onclick="openApp('cartes.html')">
-      <h3>Jeu de cartes</h3>
-      <p>Joue avec les cartes et défis</p>
+        <button class="login-btn" type="submit" id="login-btn">Entrer ✨</button>
+        <div class="error-msg" id="error-msg"></div>
+      </form>
     </div>
-
-    <div class="app-card" onclick="openApp('album.html')">
-      <h3>Album de souvenirs</h3>
-      <p>Regarde vos moments préférés</p>
-    </div>
-
-    <div class="app-card" onclick="openApp('messages.html')">
-      <h3>Messages privés</h3>
-      <p>Écris un message à l'autre</p>
-    </div>
-
-    <!-- Ajouter d'autres cartes ici -->
   </div>
-</div>
 
-<script type="module" src="script.js"></script>
+  <script src="./stars.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const btn = document.getElementById('login-btn');
+    const errorMsg = document.getElementById('error-msg');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      errorMsg.style.display = 'none';
+      errorMsg.textContent = '';
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !password) {
+        errorMsg.textContent = 'Remplis tous les champs ✨';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      const userLower = username.toLowerCase();
+
+      if (userLower !== 'toratino' && userLower !== 'luxi') {
+        errorMsg.textContent = 'Utilisateur inconnu 🌙';
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      btn.textContent = '✨ Connexion...';
+      btn.disabled = true;
+
+      setTimeout(function() {
+        if (userLower === 'toratino') {
+          window.location.href = './toratino.html';
+        } else {
+          window.location.href = './luxi.html';
+        }
+      }, 800);
+    });
+  </script>
 </body>
 </html>
