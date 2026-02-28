@@ -1,45 +1,4 @@
-/* ======= Fond étoiles et particules ======= */
-body {
-  position: relative;
-  background: radial-gradient(ellipse at bottom, #0d0d1a 0%, #1a1a2e 100%);
-  overflow: hidden;
-  transition: background 0.6s ease;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.star, .particle {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.star {
-  width: 2px;
-  height: 2px;
-  background: white;
-  opacity: 0.8;
-  animation: twinkle 2s infinite alternate;
-}
-
-@keyframes twinkle {
-  from { opacity: 0.2; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1.2); }
-}
-
-.particle {
-  width: 3px;
-  height: 3px;
-  background: white;
-  opacity: 0.7;
-  animation: floatParticle linear infinite;
-}
-
-@keyframes floatParticle {
-  from { transform: translateY(0) translateX(0); opacity: 0.5; }
-  to { transform: translateY(-200px) translateX(50px); opacity: 1; }
-}
-
-/* ======= Bannière fixe en haut ======= */
+/* Bannière fixe en haut */
 .banner {
   position: fixed;
   top: 0;
@@ -81,7 +40,7 @@ body {
   box-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
-/* ======= Container Login / App ======= */
+/* Container login / app hub */
 .container {
   position: relative;
   backdrop-filter: blur(15px);
@@ -91,61 +50,26 @@ body {
   width: 400px;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  animation: fadeIn 1s ease forwards;
   z-index: 1;
 }
 
+/* Hub central centré */
 #app-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding-top: 100px; /* pour bannière */
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  transition: transform 0.2s;
-}
-
-input:focus, select:focus {
-  transform: scale(1.02);
-}
-
-button {
-  border-radius: 10px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+  padding-top: 100px; /* Pour ne pas passer sous la bannière */
 }
 
 .hidden { display: none; }
 
-/* ======= Hub central ======= */
-.main-content { text-align: center; }
-
+/* Hub et cartes */
 .app-hub {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 25px;
-  margin-top: 20px;
 }
 
 .app-card {
@@ -168,7 +92,7 @@ button:hover {
 
 .app-card:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
 
-/* ======= Thèmes ======= */
+/* Thèmes pseudo */
 .nicolas { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; }
 .nicolas .banner { background: rgba(58,134,255,0.15); }
 .nicolas .logout-btn { background: #3a86ff; color: white; }

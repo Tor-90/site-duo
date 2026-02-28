@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<!-- Bannière fixe -->
+<!-- Bannière fixe en haut -->
 <div class="banner" id="banner-top" style="display:none;">
   <div class="welcome-text" id="welcome-text"></div>
   <button class="logout-btn" onclick="logout()">Se déconnecter</button>
@@ -28,27 +28,25 @@
   <p id="login-message"></p>
 </div>
 
-<!-- Hub central -->
+<!-- Hub central avec mini-applications -->
 <div class="container hidden" id="app-container">
-  <div class="main-content">
-    <p>Bienvenue dans votre espace privé ✨</p>
-
-    <div class="app-hub">
-      <div class="app-card" onclick="openApp('cartes.html')">
-        <h3>Jeu de cartes</h3>
-        <p>Joue avec les cartes et défis</p>
-      </div>
-
-      <div class="app-card" onclick="openApp('album.html')">
-        <h3>Album de souvenirs</h3>
-        <p>Regarde vos moments préférés</p>
-      </div>
-
-      <div class="app-card" onclick="openApp('messages.html')">
-        <h3>Messages privés</h3>
-        <p>Écris un message à l'autre</p>
-      </div>
+  <div class="app-hub">
+    <div class="app-card" onclick="openApp('cartes.html')">
+      <h3>Jeu de cartes</h3>
+      <p>Joue avec les cartes et défis</p>
     </div>
+
+    <div class="app-card" onclick="openApp('album.html')">
+      <h3>Album de souvenirs</h3>
+      <p>Regarde vos moments préférés</p>
+    </div>
+
+    <div class="app-card" onclick="openApp('messages.html')">
+      <h3>Messages privés</h3>
+      <p>Écris un message à l'autre</p>
+    </div>
+
+    <!-- Ajouter d'autres cartes ici -->
   </div>
 </div>
 

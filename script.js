@@ -15,7 +15,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const allowedUsers = ["Nicolas", "Luxi"];
 
-/* ===== Login / Firebase ===== */
+/* ===== Login ===== */
 window.login = async function () {
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
@@ -43,7 +43,7 @@ function enterApp(username) {
 
   const banner = document.getElementById("banner-top");
   banner.style.display = "flex";
-  setTimeout(()=> banner.classList.add("show"), 100); // animation fade-in du haut
+  setTimeout(()=> banner.classList.add("show"), 100);
 
   document.getElementById("welcome-text").textContent =
     username === "Nicolas"
@@ -68,9 +68,9 @@ window.logout = function () {
 };
 
 /* ===== Ouvrir mini-app ===== */
-window.openApp = function(page) { window.location.href = page; };
+window.openApp = function(page) { window.location.href = page; }
 
-/* ===== Création étoiles ===== */
+/* ===== Étoiles et particules ===== */
 function createStars(count = 120) {
   for(let i=0;i<count;i++){
     const star=document.createElement("div");
@@ -83,7 +83,6 @@ function createStars(count = 120) {
   }
 }
 
-/* ===== Création particules ===== */
 function createParticles(count = 80) {
   for(let i=0;i<count;i++){
     const p=document.createElement("div");
@@ -98,7 +97,6 @@ function createParticles(count = 80) {
   }
 }
 
-/* ===== Lancer étoiles + particules ===== */
 window.addEventListener("load", ()=>{
   createStars();
   createParticles();
